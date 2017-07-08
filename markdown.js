@@ -42,7 +42,6 @@ const DEFAULT_PADDING = 10
 
 const List = props => {
   const { children, markdown, ...rest } = props
-  console.log(rest)
   return (
     <View {...rest}>
       {children.map(renderChild)}
