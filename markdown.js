@@ -42,6 +42,7 @@ const DEFAULT_PADDING = 10
 
 const List = props => {
   const { children, markdown, ...rest } = props
+  console.log(rest)
   return (
     <View {...rest}>
       {children.map(renderChild)}
@@ -50,9 +51,11 @@ const List = props => {
 
   function renderChild (child, i) {
     const prefixText = markdown.ordered ? `${i + 1}. ` : '\u2022 '
+    const prefixStyle = markdown.ordered ? rest.listStyles.list_item_number :
+      rest.listStyles.list_item_bullet
     return (
       <View style={{flexDirection:'row', flex: 1}} key={`list-el-${i}`}>
-        <Text>{prefixText}</Text>
+        <Text style={prefixStyle}>{prefixText}</Text>
         {child}
       </View>
     )
@@ -122,6 +125,15 @@ export default function createMarkdownRenderer (markedOpts) {
       // styles,
       // markdown,
       key
+    }
+
+    if(type === 'list') {
+      elProps.listStyles = {
+        list_item_bullet: {...DEFAULT_STYLES.list_item_bullet,
+          ...markdownStyles.list_item_bullet},
+        list_item_number: {...DEFAULT_STYLES.list_item_number,
+          ...markdownStyles.list_item_number}
+      }
     }
 
     if (El !== DEFAULT_RENDERERS[type]) {
