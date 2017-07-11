@@ -41,7 +41,9 @@ const TextOnlyStyleProps = (function () {
 const DEFAULT_PADDING = 10
 
 const List = props => {
-  const { children, markdown, ...rest } = props
+  const children = props.children
+  const markdown = props.markdown
+  const rest = props
   return (
     <View {...rest}>
       {children.map(renderChild)}
