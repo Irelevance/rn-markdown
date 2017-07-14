@@ -55,11 +55,16 @@ const List = props => {
     const prefixText = markdown.ordered ? `${i + 1}. ` : '\u2022 '
     const prefixStyle = markdown.ordered ? rest.listStyles.list_item_number :
       rest.listStyles.list_item_bullet
+    
+    const viewProps = {
+      style: {flexDirection: 'row', flex: 1},
+      key: `list-el-${i}`
+    }
     return (
-      <View style={{flexDirection:'row', flex: 1}} key={`list-el-${i}`}>
-        <Text style={prefixStyle}>{prefixText}</Text>
-        {child}
-      </View>
+      React.createElement(View, viewProps,
+        React.createElement(Text, {style: prefixStyle}, prefixText),
+        child
+      )
     )
   }
 }
