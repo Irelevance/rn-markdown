@@ -41,13 +41,14 @@ const TextOnlyStyleProps = (function () {
 const DEFAULT_PADDING = 10
 
 const List = props => {
+
   const children = props.children
   const markdown = props.markdown
   const rest = props
+
+  console.log(props)
   return (
-    <View {...rest}>
-      {children.map(renderChild)}
-    </View>
+    React.createElement(View, props, children.map(renderChild))
   )
 
   function renderChild (child, i) {
@@ -63,34 +64,32 @@ const List = props => {
   }
 }
 
-// const WrappedText = ({ ...props })  => {
-//   return (
-//     <View>
-//       <Text {...props}></Text>
-//     </View>
-//   )
-// }
-
 const DEFAULT_RENDERERS = {
   container: ScrollView,
   text: Text
 }
 
 const DEFAULT_CUSTOM_RENDERERS = {
-  image: ({ ...props, markdown }) => {
-    return <Image source={{ uri: markdown.href }} {...props} />
+  image: (data) => {
+    const markdown = data.markdown
+    
+    const props = omit(data, 'markdown')
+    props.source = {uri: markdown.href}
+
+    return React.createElement(Image, props)
   },
   list: List
 }
 
 export default function createMarkdownRenderer (markedOpts) {
-  const typeToRenderer = {
-    ...DEFAULT_RENDERERS,
-    ...DEFAULT_CUSTOM_RENDERERS
-  }
+  const typeToRenderer = Object.assign({},DEFAULT_RENDERERS, DEFAULT_CUSTOM_RENDERERS)
 
   function renderGroup ({ markdown, markdownStyles={}, style, key }) {
-    const { type, children, ordered, depth, text } = markdown
+    const type = markdown.type
+    const children = markdown.children
+    const ordered = markdown.ordered
+    const depth = markdown.depth
+    const text = markdown.text
 
     let El = typeToRenderer[type]
     if (!El) {
@@ -130,30 +129,30 @@ export default function createMarkdownRenderer (markedOpts) {
 
     if(type === 'list') {
       elProps.listStyles = {
-        list_item_bullet: {...DEFAULT_STYLES.list_item_bullet,
-          ...markdownStyles.list_item_bullet},
-        list_item_number: {...DEFAULT_STYLES.list_item_number,
-          ...markdownStyles.list_item_number}
+        list_item_bullet: Object.assign(
+          {}, DEFAULT_STYLES.list_item_bullet, markdownStyles.list_item_bullet
+        ),
+        list_item_number: Object.assign(
+          {}, DEFAULT_STYLES.list_item_number, markdownStyles.list_item_number
+        )
       }
-    }
+    }   
 
     if (El !== DEFAULT_RENDERERS[type]) {
       elProps.markdown = markdown
     }
 
-    return (
-      <El {...elProps}>
-        {contents}
-      </El>
-    )
+    return React.createElement(El, elProps, contents)
   }
 
-  const Markdown = ({ children, ...rest }) => {
+  const Markdown = (data) => {
+    const children = data.children
+    const rest = omit(data, 'children')
+
     const parsed = parse(children, markedOpts)
-    return renderGroup({ markdown: parsed, ...rest })
+    return renderGroup(Object.assign({ markdown: parsed}, rest))
   }
 
-  // allow override renderers and textContainers for this markdown instance
   Markdown.renderer = typeToRenderer
   return Markdown
 }
@@ -201,7 +200,7 @@ function getAncestorTextStyles ({ markdown, markdownStyles }) {
 
 function flatten (styleArray) {
   return styleArray.reduce((flat, next) => {
-    return { ...flat, ...next }
+    return Object.assign({}, flat, next)
   }, {})
 }
 
