@@ -46,7 +46,6 @@ const List = props => {
   const markdown = props.markdown
   const rest = props
 
-  console.log(props)
   return (
     React.createElement(View, props, children.map(renderChild))
   )
@@ -170,9 +169,6 @@ function getStyles ({ markdown, markdownStyles, textOnly }) {
   return styleNames
     .map(styleName => {
       const defaultStyle = DEFAULT_STYLES[styleName]
-      if (!defaultStyle) {
-        log(`don't have style mapping for "${styleName}"`)
-      }
 
       return defaultStyle
     })
